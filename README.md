@@ -12,7 +12,7 @@ Install uv:
 https://docs.astral.sh/uv/getting-started/installation/
 
 Clone the repository:
-`git clone git@github.com:samGbos/td.git`
+`git clone https://github.com/samGbos/td.git`
 
 Use uv to install python:
 `uv python install 3.12`
