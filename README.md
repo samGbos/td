@@ -19,3 +19,6 @@ Use uv to install python:
 
 Run the program with:
 `uv run main.py`
+
+Pygame docs:
+https://www.pygame.org/docs/
