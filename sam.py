@@ -39,12 +39,15 @@ class Grape:
 
     def update_world(self, _now, dt):
         self.pos += self.velocity * dt
-
-        should_delete_self = is_offscreen(self.pos) or self.velocity.length() == 0
+        did_hit_player = (self.pos-player_pos).length() <= player_radius + projectile_radius
+        if did_hit_player:
+            global player_hp
+            player_hp -= 10
+        should_delete_self = is_offscreen(self.pos) or self.velocity.length() == 0 or did_hit_player
         return should_delete_self
 
     def draw(self):
-        pygame.draw.circle(screen, 'black', self.pos, 8)
+        pygame.draw.circle(screen, 'black', self.pos, projectile_radius)
 
 # pygame setup
 pygame.init()
@@ -53,10 +56,13 @@ clock = pygame.time.Clock()
 running = True
 dt = 0
 
-player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
+player_pos = pygame.Vector2(screen.get_width() / 4, screen.get_height() / 4)
+player_hp = 100
+player_radius = 32
 player_speed = 300
 enemies = [GrapeTower(pos=pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2))]
 projectiles = []
+projectile_radius = 8
 
 
 def update_world(now, dt):
@@ -75,10 +81,11 @@ def update_world(now, dt):
         else:
             idx += 1
 
-
-
 def render():
-    pygame.draw.circle(screen, "blue", player_pos, 32)
+    if player_hp > 0:
+        pygame.draw.circle(screen, "blue", player_pos, player_radius)
+    else:
+        pygame.draw.circle(screen, "red",player_pos, player_radius)
 
     for enemy in enemies:
         enemy.draw()
