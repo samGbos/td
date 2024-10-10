@@ -4,6 +4,17 @@ from dataclasses import dataclass
 
 import pygame
 
+GAME_WIDTH = 1280
+GAME_HEIGHT = 720
+
+def is_offscreen(pos):
+    """
+    Return True if this obj is off-screen and should be deleted.
+    Intended for use with various kinds of projectiles
+    """
+    margin = 100
+    return pos.x < -margin or pos.x > GAME_WIDTH + margin or pos.y < -margin or pos.y > GAME_HEIGHT + margin
+
 @dataclass
 class GrapeTower:
     pos: pygame.Vector2
@@ -29,6 +40,9 @@ class Grape:
     def update_world(self, _now, dt):
         self.pos += self.velocity * dt
 
+        should_delete_self = is_offscreen(self.pos) or self.velocity.length() == 0
+        return should_delete_self
+
     def draw(self):
         pygame.draw.circle(screen, 'black', self.pos, 8)
 
@@ -49,9 +63,18 @@ def update_world(now, dt):
     for enemy in enemies:
         # E.g. create projectiles
         enemy.update_world(now, dt)
-    for projectile in projectiles:
+
+    idx = 0
+    while idx < len(projectiles):
+        projectile = projectiles[idx]
         # E.g. update positions, check for collisions
-        projectile.update_world(now, dt)
+        delete = projectile.update_world(now, dt)
+        if delete:
+            projectiles.pop(idx)
+            print(projectiles)
+        else:
+            idx += 1
+
 
 
 def render():
