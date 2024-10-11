@@ -6,4 +6,13 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "pygame>=2.6.1",
+    "ruff>=0.6.9",
 ]
+
+
+[tool.ruff]
+include = ['pyproject.toml', 'common.py', 'main.py', 'editor.py', 'learning/']
+line-length = 100
+
+[tool.ruff.format]
+quote-style = "single"
