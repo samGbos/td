@@ -4,7 +4,7 @@ import time
 
 import pygame
 
-from common import Game, Player, GrapeTower
+from common import Game, Player, TOWER_CLASSES
 
 
 def update(game: Game, now, dt):
@@ -53,8 +53,9 @@ def main():
     player = Player(level_obj['player_starting_location'][0], level_obj['player_starting_location'][1])
     enemies = pygame.sprite.Group()
     for tower in level_obj['towers']:
-        if tower['type'] == 'grape':
-            enemies.add(GrapeTower(pos=pygame.Vector2(tower['position'][0], tower['position'][1])))
+        for tower_cls in TOWER_CLASSES:
+            if tower_cls.name == tower['type']:
+                enemies.add(tower_cls(pos=pygame.Vector2(tower['position'][0], tower['position'][1])))
     game = Game(player=player, enemies=enemies, projectiles=pygame.sprite.Group())
 
     while running:

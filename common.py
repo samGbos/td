@@ -25,13 +25,18 @@ GRAPE_TOWER_WIDTH = 64
 GRAPE_TOWER_HEIGHT = 64
 
 class GrapeTower(pygame.sprite.Sprite):
-    last_fired: float | None = None
+    name = 'grape'
 
     def __init__(self, pos: Vector2):
         super().__init__()
         self.image = pygame.Surface([GRAPE_TOWER_WIDTH, GRAPE_TOWER_HEIGHT])
         self.image.fill('red')
         self.rect = pygame.rect.Rect(pos.x, pos.y, self.image.get_width(), self.image.get_height())
+        self.last_fired: float | None = None
+
+    @staticmethod
+    def pos_from_mouse_pos(mouse_pos):
+        return Vector2(mouse_pos.x - GRAPE_TOWER_WIDTH / 2, mouse_pos.y - GRAPE_TOWER_HEIGHT / 2)
 
     def update(self, game, now, _dt):
         dir_x = game.player.rect.center[0] - self.rect.center[0]
@@ -103,9 +108,13 @@ class Player(pygame.sprite.Sprite):
     def draw(self, screen):
         screen.blit(self.image, self.rect)
 
+TOWER_CLASSES = [GrapeTower]
+
 
 @dataclass
 class Game:
     player: Player
     enemies: pygame.sprite.Group
     projectiles: pygame.sprite.Group
+
+

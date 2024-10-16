@@ -5,18 +5,19 @@ import time
 import pygame
 from pygame import Vector2
 
-from common import Game, GrapeTower, GRAPE_TOWER_WIDTH, GRAPE_TOWER_HEIGHT
+from common import Game, GrapeTower, TOWER_CLASSES
 
 
 def update(game: Game, now, dt):
     pass
 
-def draw(game, screen, cursor_mode):
 
+def draw(game, screen, class_of_obj_to_place):
     mouse_pos = Vector2(pygame.mouse.get_pos())
 
-    if cursor_mode == 'grape':
-        grape_tower = GrapeTower(pos=Vector2(mouse_pos.x - GRAPE_TOWER_WIDTH / 2, mouse_pos.y - GRAPE_TOWER_HEIGHT /2))
+    if class_of_obj_to_place:
+        pos = class_of_obj_to_place.pos_from_mouse_pos(mouse_pos)
+        grape_tower = class_of_obj_to_place(pos=pos)
         grape_tower.draw(screen)
 
     for enemy in game.enemies:
@@ -40,7 +41,7 @@ def main():
     #     print(level_obj['towers'][1])
 
     game = Game(player=None, enemies=pygame.sprite.Group(), projectiles=pygame.sprite.Group())
-    cursor_mode = None
+    class_of_obj_to_place = None
 
     while running:
         # poll for events
@@ -48,10 +49,10 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            if event.type == pygame.MOUSEBUTTONUP:
-                pos = event.pos
-                grape_tower = GrapeTower(pos=Vector2(pos[0] - GRAPE_TOWER_WIDTH / 2, pos[1] - GRAPE_TOWER_HEIGHT /2))
-                game.enemies.add(grape_tower)
+            if event.type == pygame.MOUSEBUTTONUP and class_of_obj_to_place:
+                pos = class_of_obj_to_place.pos_from_mouse_pos(Vector2(event.pos))
+                obj_to_place = GrapeTower(pos=pos)
+                game.enemies.add(obj_to_place)
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_s:
                     towers_list = []
@@ -74,13 +75,15 @@ def main():
         # Handle inputs
         keys = pygame.key.get_pressed()
         if keys[pygame.K_1]:
-            cursor_mode = 'grape'
+            class_of_obj_to_place = TOWER_CLASSES[0]
+        if keys[pygame.K_2]:
+            class_of_obj_to_place = TOWER_CLASSES[1]
 
         # Update world
         update(game, time.perf_counter(), dt)
 
         # Draw the current game state
-        draw(game, screen, cursor_mode)
+        draw(game, screen, class_of_obj_to_place)
 
         # limits FPS to 60
         # dt is delta time in seconds since last frame, used for framerate-
