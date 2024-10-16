@@ -49,14 +49,14 @@ def main():
                 running = False
             if event.type == pygame.MOUSEBUTTONUP and class_of_obj_to_place:
                 pos = class_of_obj_to_place.pos_from_mouse_pos(Vector2(event.pos))
-                obj_to_place = GrapeTower(pos=pos)
+                obj_to_place = class_of_obj_to_place(pos=pos)
                 game.enemies.add(obj_to_place)
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_s:
                     towers_list = []
                     for enemy in game.enemies:
                         towers_list.append({
-                            'type': 'grape',
+                            'type': enemy.name,
                             'position': enemy.rect.topleft,
                         })
                     with open(level_filepath, 'w') as f:
