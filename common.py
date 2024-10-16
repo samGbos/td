@@ -1,3 +1,4 @@
+import json
 from dataclasses import dataclass
 
 import pygame
@@ -109,6 +110,20 @@ class Player(pygame.sprite.Sprite):
         screen.blit(self.image, self.rect)
 
 TOWER_CLASSES = [GrapeTower]
+
+def load_game(filepath):
+    with open(filepath) as f:
+        file_contents = f.read()
+        level_obj = json.loads(file_contents)
+
+    player = Player(level_obj['player_starting_location'][0], level_obj['player_starting_location'][1])
+    enemies = pygame.sprite.Group()
+    for tower in level_obj['towers']:
+        for tower_cls in TOWER_CLASSES:
+            if tower_cls.name == tower['type']:
+                enemies.add(tower_cls(pos=pygame.Vector2(tower['position'][0], tower['position'][1])))
+    game = Game(player=player, enemies=enemies, projectiles=pygame.sprite.Group())
+    return game
 
 
 @dataclass

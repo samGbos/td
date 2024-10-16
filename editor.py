@@ -1,11 +1,12 @@
 # Example file showing a circle moving on screen
 import json
+import sys
 import time
 
 import pygame
 from pygame import Vector2
 
-from common import Game, GrapeTower, TOWER_CLASSES
+from common import Game, GrapeTower, TOWER_CLASSES, load_game
 
 
 def update(game: Game, now, dt):
@@ -34,13 +35,10 @@ def main():
     running = True
     dt = 0
 
+    level_filepath = sys.argv[1]
     # Load the level
-    # with open('levels/level01.json') as f:
-    #     file_contents = f.read()
-    #     level_obj = json.loads(file_contents)
-    #     print(level_obj['towers'][1])
+    game = load_game(level_filepath)
 
-    game = Game(player=None, enemies=pygame.sprite.Group(), projectiles=pygame.sprite.Group())
     class_of_obj_to_place = None
 
     while running:
@@ -61,7 +59,7 @@ def main():
                             'type': 'grape',
                             'position': enemy.rect.topleft,
                         })
-                    with open('levels/level01.json', 'w') as f:
+                    with open(level_filepath, 'w') as f:
                         level_obj = {
                             'player_starting_location': [250, 250],
                             'towers': towers_list

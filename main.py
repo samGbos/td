@@ -1,10 +1,11 @@
 # Example file showing a circle moving on screen
 import json
+import sys
 import time
 
 import pygame
 
-from common import Game, Player, TOWER_CLASSES
+from common import Game, Player, TOWER_CLASSES, load_game
 
 
 def update(game: Game, now, dt):
@@ -44,19 +45,7 @@ def main():
     dt = 0
 
     # Load the level
-    with open('levels/level01.json') as f:
-        file_contents = f.read()
-        level_obj = json.loads(file_contents)
-        print(level_obj['towers'][1])
-
-
-    player = Player(level_obj['player_starting_location'][0], level_obj['player_starting_location'][1])
-    enemies = pygame.sprite.Group()
-    for tower in level_obj['towers']:
-        for tower_cls in TOWER_CLASSES:
-            if tower_cls.name == tower['type']:
-                enemies.add(tower_cls(pos=pygame.Vector2(tower['position'][0], tower['position'][1])))
-    game = Game(player=player, enemies=enemies, projectiles=pygame.sprite.Group())
+    game = load_game(sys.argv[1])
 
     while running:
         # poll for events
@@ -75,13 +64,13 @@ def main():
         else:
             adjust_pythagoras = 1
         if keys[pygame.K_w]:
-            player.rect.y -= player.speed * adjust_pythagoras * dt
+            game.player.rect.y -= game.player.speed * adjust_pythagoras * dt
         if keys[pygame.K_s]:
-            player.rect.y += player.speed * adjust_pythagoras * dt
+            game.player.rect.y += game.player.speed * adjust_pythagoras * dt
         if keys[pygame.K_a]:
-            player.rect.x -= player.speed * adjust_pythagoras * dt
+            game.player.rect.x -= game.player.speed * adjust_pythagoras * dt
         if keys[pygame.K_d]:
-            player.rect.x += player.speed * adjust_pythagoras * dt
+            game.player.rect.x += game.player.speed * adjust_pythagoras * dt
 
         # Update world
         update(game, time.perf_counter(), dt)
