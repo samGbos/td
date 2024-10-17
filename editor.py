@@ -76,6 +76,8 @@ def main():
             class_of_obj_to_place = TOWER_CLASSES[0]
         if keys[pygame.K_2]:
             class_of_obj_to_place = TOWER_CLASSES[1]
+        if keys[pygame.K_3]:
+            class_of_obj_to_place = TOWER_CLASSES[2]
 
         # Update world
         update(game, time.perf_counter(), dt)

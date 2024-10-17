@@ -29,6 +29,10 @@ KIWI_TOWER_RANGE = 200
 KIWI_TOWER_WIDTH = 64
 KIWI_TOWER_HEIGHT = 64
 
+DRAGON_FRUIT_TOWER_RANGE = 250
+DRAGON_FRUIT_TOWER_WIDTH = 32
+DRAGON_FRUIT_TOWER_HEIGHT = 32
+
 class GrapeTower(pygame.sprite.Sprite):
     name = 'grape'
 
@@ -153,6 +157,72 @@ class Kiwi(pygame.sprite.Sprite):
         screen.blit(self.image, self.rect)
 
 
+class DragonFruitTower(pygame.sprite.Sprite):
+    name = 'dragonfruit'
+
+    def __init__(self, pos: Vector2):
+        super().__init__()
+        self.image = pygame.Surface([DRAGON_FRUIT_TOWER_WIDTH, DRAGON_FRUIT_TOWER_HEIGHT])
+        self.image.fill('orange')
+        self.rect = pygame.rect.Rect(pos.x, pos.y, self.image.get_width(), self.image.get_height())
+        self.last_fired: float | None = None
+
+    @staticmethod
+    def pos_from_mouse_pos(mouse_pos):
+        return Vector2(mouse_pos.x - DRAGON_FRUIT_TOWER_WIDTH / 2, mouse_pos.y - DRAGON_FRUIT_TOWER_HEIGHT / 2)
+
+    def update(self, game, now, _dt):
+        dir_x = game.player.rect.center[0] - self.rect.center[0]
+        dir_y = game.player.rect.center[1] - self.rect.center[1]
+        direction = pygame.Vector2(dir_x, dir_y)
+        dist_from_player = direction.length()
+        if dist_from_player <= DRAGON_FRUIT_TOWER_RANGE and (self.last_fired is None or now > self.last_fired + 2):
+            if direction.length_squared():
+                direction.normalize_ip()
+                speedofdiffbullets = 300 
+                for i in range(3): #this should make 3 bullets right? why are only 2 being shown?
+                    game.projectiles.add(Grape(pos=Vector2(self.rect.center), velocity=direction * speedofdiffbullets))
+                    speedofdiffbullets -= speedofdiffbullets - 50 #decrementing speed of var speedofdiffbullets
+                self.last_fired = now
+
+    def draw_range(self, screen):
+        surface = pygame.Surface((DRAGON_FRUIT_TOWER_RANGE * 2, DRAGON_FRUIT_TOWER_RANGE * 2), pygame.SRCALPHA)
+        pygame.draw.circle(surface, '#0000ff55', (DRAGON_FRUIT_TOWER_RANGE, DRAGON_FRUIT_TOWER_RANGE), DRAGON_FRUIT_TOWER_RANGE)
+        screen.blit(surface, (self.rect.center[0] - DRAGON_FRUIT_TOWER_RANGE, self.rect.center[1] - DRAGON_FRUIT_TOWER_RANGE))
+
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+
+class DragonFruit(pygame.sprite.Sprite):
+    def __init__(self, pos: Vector2, velocity: Vector2):
+        super().__init__()
+        self.image = pygame.Surface([8, 8])
+        self.image.fill('black')
+
+        self.rect = pygame.rect.Rect(pos.x, pos.y, self.image.get_width(), self.image.get_height())
+        self.starting_pos = pos
+
+        self.velocity = velocity
+        self.pending_removal = False
+
+    def update(self, game, _now, dt):
+
+        dir_x = self.starting_pos.x - self.rect.center[0]
+        dir_y = self.starting_pos.y - self.rect.center[1]
+        direction = pygame.Vector2(dir_x, dir_y)
+        dist_from_starting_pos = direction.length()
+        if self.pending_removal or is_offscreen(self.rect) or self.velocity.length_squared() == 0 or dist_from_starting_pos > DRAGON_FRUIT_TOWER_RANGE:
+            self.kill()
+            return
+
+        dpos = self.velocity * dt
+        self.rect.x += dpos.x
+        self.rect.y += dpos.y
+
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+
+
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
@@ -173,7 +243,7 @@ class Player(pygame.sprite.Sprite):
     def draw(self, screen):
         screen.blit(self.image, self.rect)
 
-TOWER_CLASSES = [GrapeTower, KiwiTower]
+TOWER_CLASSES = [GrapeTower, KiwiTower, DragonFruitTower]
 
 def load_game(filepath):
     with open(filepath) as f:
