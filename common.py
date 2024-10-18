@@ -7,6 +7,20 @@ from pygame import Vector2
 GAME_WIDTH = 1280
 GAME_HEIGHT = 720
 
+GRAPE_TOWER_RANGE = 300
+GRAPE_TOWER_WIDTH = 64
+GRAPE_TOWER_HEIGHT = 64
+
+KIWI_TOWER_RANGE = 200
+KIWI_TOWER_WIDTH = 64
+KIWI_TOWER_HEIGHT = 64
+
+DRAGON_FRUIT_TOWER_RANGE = 250
+DRAGON_FRUIT_TOWER_WIDTH = 32
+DRAGON_FRUIT_TOWER_HEIGHT = 32
+
+DEFAULT_PLAYER_START_X = GAME_WIDTH / 4
+DEFAULT_PLAYER_START_Y = GAME_HEIGHT / 4
 
 def is_offscreen(pos):
     """
@@ -21,17 +35,6 @@ def is_offscreen(pos):
         or pos.y > GAME_HEIGHT + margin
     )
 
-GRAPE_TOWER_RANGE = 300
-GRAPE_TOWER_WIDTH = 64
-GRAPE_TOWER_HEIGHT = 64
-
-KIWI_TOWER_RANGE = 200
-KIWI_TOWER_WIDTH = 64
-KIWI_TOWER_HEIGHT = 64
-
-DRAGON_FRUIT_TOWER_RANGE = 250
-DRAGON_FRUIT_TOWER_WIDTH = 32
-DRAGON_FRUIT_TOWER_HEIGHT = 32
 
 class GrapeTower(pygame.sprite.Sprite):
     name = 'grape'
@@ -252,16 +255,25 @@ class Player(pygame.sprite.Sprite):
 TOWER_CLASSES = [GrapeTower, KiwiTower, DragonFruitTower]
 
 def load_game(filepath):
-    with open(filepath) as f:
-        file_contents = f.read()
-        level_obj = json.loads(file_contents)
-
-    player = Player(level_obj['player_starting_location'][0], level_obj['player_starting_location'][1])
+    if filepath:
+        print(f"Loading {filepath}")
+    else:
+        print("Loading new level")
     enemies = pygame.sprite.Group()
-    for tower in level_obj['towers']:
-        for tower_cls in TOWER_CLASSES:
-            if tower_cls.name == tower['type']:
-                enemies.add(tower_cls(pos=pygame.Vector2(tower['position'][0], tower['position'][1])))
+
+    if filepath:
+        with open(filepath) as f:
+            file_contents = f.read()
+            level_obj = json.loads(file_contents)
+            player = Player(level_obj['player_starting_location'][0], level_obj['player_starting_location'][1])
+            for tower in level_obj['towers']:
+                for tower_cls in TOWER_CLASSES:
+                    if tower_cls.name == tower['type']:
+                        enemies.add(tower_cls(pos=pygame.Vector2(tower['position'][0], tower['position'][1])))
+
+    else:
+        player = Player(DEFAULT_PLAYER_START_X, DEFAULT_PLAYER_START_Y)
+
     game = Game(player=player, enemies=enemies, projectiles=pygame.sprite.Group())
     return game
 

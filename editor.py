@@ -7,6 +7,7 @@ import pygame
 from pygame import Vector2
 
 from common import Game, GrapeTower, TOWER_CLASSES, load_game
+from utils import get_next_uncreated_level_filepath
 
 
 def update(game: Game, now, dt):
@@ -35,7 +36,7 @@ def main():
     running = True
     dt = 0
 
-    level_filepath = sys.argv[1]
+    level_filepath = sys.argv[1] if len(sys.argv) > 1 else None
     # Load the level
     game = load_game(level_filepath)
 
@@ -59,6 +60,8 @@ def main():
                             'type': enemy.name,
                             'position': enemy.rect.topleft,
                         })
+                    if level_filepath is None:
+                        level_filepath = get_next_uncreated_level_filepath()
                     with open(level_filepath, 'w') as f:
                         level_obj = {
                             'player_starting_location': [250, 250],

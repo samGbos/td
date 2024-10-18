@@ -1,11 +1,11 @@
 # Example file showing a circle moving on screen
-import json
 import sys
 import time
 
 import pygame
 
-from common import Game, Player, TOWER_CLASSES, load_game
+from common import Game, load_game
+from utils import get_latest_level_filepath_and_number
 
 
 def update(game: Game, now, dt):
@@ -45,7 +45,8 @@ def main():
     dt = 0
 
     # Load the level
-    game = load_game(sys.argv[1])
+    level_filepath = sys.argv[1] if len(sys.argv) > 1 else get_latest_level_filepath_and_number()[0]
+    game = load_game(level_filepath)
 
     while running:
         # poll for events
