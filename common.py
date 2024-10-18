@@ -72,6 +72,7 @@ class Grape(pygame.sprite.Sprite):
         self.image = pygame.Surface([8, 8])
         self.image.fill('black')
 
+        self.pos = pos
         self.rect = pygame.rect.Rect(pos.x, pos.y, self.image.get_width(), self.image.get_height())
         self.starting_pos = pos
 
@@ -89,8 +90,9 @@ class Grape(pygame.sprite.Sprite):
             return
 
         dpos = self.velocity * dt
-        self.rect.x += dpos.x
-        self.rect.y += dpos.y
+        self.pos += dpos
+        self.rect.x = self.pos.x
+        self.rect.y = self.pos.y
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
@@ -133,6 +135,7 @@ class Kiwi(pygame.sprite.Sprite):
         self.image = pygame.Surface([16, 16])
         self.image.fill('black')
 
+        self.pos = pos
         self.rect = pygame.rect.Rect(pos.x, pos.y, self.image.get_width(), self.image.get_height())
         self.starting_pos = pos
 
@@ -150,8 +153,9 @@ class Kiwi(pygame.sprite.Sprite):
             return
 
         dpos = self.velocity * dt
-        self.rect.x += dpos.x
-        self.rect.y += dpos.y
+        self.pos += dpos
+        self.rect.x = self.pos.x
+        self.rect.y = self.pos.y
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
@@ -182,7 +186,7 @@ class DragonFruitTower(pygame.sprite.Sprite):
                 speedofdiffbullets = 300 
                 for i in range(3): #this should make 3 bullets right? why are only 2 being shown?
                     game.projectiles.add(Grape(pos=Vector2(self.rect.center), velocity=direction * speedofdiffbullets))
-                    speedofdiffbullets -= speedofdiffbullets - 50 #decrementing speed of var speedofdiffbullets
+                    speedofdiffbullets -= 50 #decrementing speed of var speedofdiffbullets
                 self.last_fired = now
 
     def draw_range(self, screen):
@@ -199,6 +203,7 @@ class DragonFruit(pygame.sprite.Sprite):
         self.image = pygame.Surface([8, 8])
         self.image.fill('black')
 
+        self.pos = pos
         self.rect = pygame.rect.Rect(pos.x, pos.y, self.image.get_width(), self.image.get_height())
         self.starting_pos = pos
 
@@ -216,8 +221,9 @@ class DragonFruit(pygame.sprite.Sprite):
             return
 
         dpos = self.velocity * dt
-        self.rect.x += dpos.x
-        self.rect.y += dpos.y
+        self.pos += dpos
+        self.rect.x = self.pos.x
+        self.rect.y = self.pos.y
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
