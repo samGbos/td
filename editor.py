@@ -6,7 +6,7 @@ import time
 import pygame
 from pygame import Vector2
 
-from common import Game, GrapeTower, TOWER_CLASSES, load_game
+from common import Game, GrapeTower, PLACEABLE_OBJECT_CLASSES, load_game, NOT_YET_PLACED
 from utils import get_next_uncreated_level_filepath
 
 
@@ -17,13 +17,19 @@ def update(game: Game, now, dt):
 def draw(game, screen, class_of_obj_to_place):
     mouse_pos = Vector2(pygame.mouse.get_pos())
 
+    for surface in game.surfaces:
+        surface.fill('#00000000')
+
     if class_of_obj_to_place:
         pos = class_of_obj_to_place.pos_from_mouse_pos(mouse_pos)
-        grape_tower = class_of_obj_to_place(pos=pos)
-        grape_tower.draw(screen)
+        obj_to_place = class_of_obj_to_place(game=game, pos=pos, placement_mode=NOT_YET_PLACED)
+        obj_to_place.draw(game.surfaces)
 
-    for enemy in game.enemies:
-        enemy.draw(screen)
+    for obj in game.game_objects:
+        obj.draw(game.surfaces)
+
+    for surface in game.surfaces:
+        screen.blit(surface, (0, 0))
 
     pygame.display.flip()
 
@@ -50,23 +56,21 @@ def main():
                 running = False
             if event.type == pygame.MOUSEBUTTONUP and class_of_obj_to_place:
                 pos = class_of_obj_to_place.pos_from_mouse_pos(Vector2(event.pos))
-                obj_to_place = class_of_obj_to_place(pos=pos)
-                game.enemies.add(obj_to_place)
+                class_of_obj_to_place(game=game, pos=pos)
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_s:
-                    towers_list = []
-                    for enemy in game.enemies:
-                        towers_list.append({
-                            'type': enemy.name,
-                            'position': enemy.rect.topleft,
-                        })
+                    objects_list = []
+                    for obj in game.game_objects:
+                        objects_list.append(
+                            {
+                                'type': obj.name,
+                                'position': obj.rect.topleft,
+                            }
+                        )
                     if level_filepath is None:
                         level_filepath = get_next_uncreated_level_filepath()
                     with open(level_filepath, 'w') as f:
-                        level_obj = {
-                            'player_starting_location': [250, 250],
-                            'towers': towers_list
-                        }
+                        level_obj = {'player_starting_location': [250, 250], 'objects': objects_list}
                         json_str = json.dumps(level_obj)
                         f.write(json_str)
 
@@ -75,12 +79,10 @@ def main():
 
         # Handle inputs
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_1]:
-            class_of_obj_to_place = TOWER_CLASSES[0]
-        if keys[pygame.K_2]:
-            class_of_obj_to_place = TOWER_CLASSES[1]
-        if keys[pygame.K_3]:
-            class_of_obj_to_place = TOWER_CLASSES[2]
+        for idx, key_name in enumerate(range(pygame.K_1, pygame.K_9)):
+            if keys[key_name] and idx < len(PLACEABLE_OBJECT_CLASSES):
+                class_of_obj_to_place = PLACEABLE_OBJECT_CLASSES[idx]
+                break
 
         # Update world
         update(game, time.perf_counter(), dt)

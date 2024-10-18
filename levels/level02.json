@@ -1,1 +1,43 @@
-{"player_starting_location": [250, 250], "towers": [{"type": "grape", "position": [1183, 23]}, {"type": "kiwi", "position": [1173, 614]}, {"type": "dragonfruit", "position": [614, 340]}, {"type": "dragonfruit", "position": [470, 139]}, {"type": "dragonfruit", "position": [473, 526]}]}
+{
+  "player_starting_location": [
+    250,
+    250
+  ],
+  "objects": [
+    {
+      "type": "grapetower",
+      "position": [
+        1183,
+        23
+      ]
+    },
+    {
+      "type": "kiwitower",
+      "position": [
+        1173,
+        614
+      ]
+    },
+    {
+      "type": "dragonfruittower",
+      "position": [
+        614,
+        340
+      ]
+    },
+    {
+      "type": "dragonfruittower",
+      "position": [
+        470,
+        139
+      ]
+    },
+    {
+      "type": "dragonfruittower",
+      "position": [
+        473,
+        526
+      ]
+    }
+  ]
+}

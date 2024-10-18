@@ -22,16 +22,16 @@ def update(game: Game, now, dt):
 
 
 def draw(game, screen):
-    for enemy in game.enemies:
-        enemy.draw_range(screen)
 
-    for enemy in game.enemies:
-        enemy.draw(screen)
 
-    game.player.draw(screen)
+    for surface in game.surfaces:
+        surface.fill('#00000000')
 
-    for projectile in game.projectiles:
-        projectile.draw(screen)
+    for obj in game.game_objects:
+        obj.draw(game.surfaces)
+
+    for surface in game.surfaces:
+        screen.blit(surface, (0, 0))
 
     pygame.display.flip()
 
@@ -64,14 +64,34 @@ def main():
             adjust_pythagoras = 0.7071067811865476
         else:
             adjust_pythagoras = 1
-        if keys[pygame.K_w]:
-            game.player.rect.y -= game.player.speed * adjust_pythagoras * dt
-        if keys[pygame.K_s]:
-            game.player.rect.y += game.player.speed * adjust_pythagoras * dt
-        if keys[pygame.K_a]:
-            game.player.rect.x -= game.player.speed * adjust_pythagoras * dt
-        if keys[pygame.K_d]:
-            game.player.rect.x += game.player.speed * adjust_pythagoras * dt
+
+        # Move up/down
+        if keys[pygame.K_w] or keys[pygame.K_s]:
+            if keys[pygame.K_w]:
+                game.player.rect.y -= game.player.speed * adjust_pythagoras * dt
+            if keys[pygame.K_s]:
+                game.player.rect.y += game.player.speed * adjust_pythagoras * dt
+
+            blocking_objs = pygame.sprite.spritecollide(game.player, game.blockers, False)
+            for blocking_obj in blocking_objs:
+                if keys[pygame.K_w]:
+                    game.player.rect.top = blocking_obj.rect.bottom
+                if keys[pygame.K_s]:
+                    game.player.rect.bottom = blocking_obj.rect.top
+
+        # Move left/right
+        if keys[pygame.K_a] or keys[pygame.K_d]:
+            if keys[pygame.K_a]:
+                game.player.rect.x -= game.player.speed * adjust_pythagoras * dt
+            if keys[pygame.K_d]:
+                game.player.rect.x += game.player.speed * adjust_pythagoras * dt
+
+            blocking_objs = pygame.sprite.spritecollide(game.player, game.blockers, False)
+            for blocking_obj in blocking_objs:
+                if keys[pygame.K_a]:
+                    game.player.rect.left = blocking_obj.rect.right
+                if keys[pygame.K_d]:
+                    game.player.rect.right = blocking_obj.rect.left
 
         # Update world
         update(game, time.perf_counter(), dt)

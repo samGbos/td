@@ -23,7 +23,6 @@ def get_latest_level_filepath_and_number():
     max_level_filename = None
     for filename in filenames:
         match = re.match(r"level(\d+)(_.*)?\.json", filename)
-        print(filename, match)
         if match:
             level = int(match.group(1))
             if max_level is None or level > max_level:
